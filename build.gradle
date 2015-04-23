@@ -1,0 +1,70 @@
+apply plugin: 'groovy'
+//apply plugin: 'eclipse'
+
+version = 1.0
+
+dependencies {
+	// this includes all the files under 'lib' at compile time
+	// NOTE: The files will need to be added to the classpath at runtime.
+	// This is done via a shell script ot batch file to invoke the tester
+	compile fileTree('./lib')	
+}
+
+//eclipse {
+//	classpath {
+//		file {
+//			whenMerged { classpath ->
+//				def groovySupportContainer = new org.gradle.plugins.ide.eclipse.model.Container('GROOVY_SUPPORT')
+//				groovySupportContainer.exported = true
+//				classpath.entries << groovySupportContainer
+//			}
+//		}
+//	}
+//}
+
+jar {
+    jar.archiveName = "$baseName-$version" + ".jar"
+    
+    // NOTE: files in src\main\resources - 
+    // will automatically be included in the jar file.
+    //
+    // In this case I am keeping the properties outside of the JAR file so
+    // we can modify them as needed, so they are not placed in the resources
+    // folder
+    //
+	
+    manifest {
+       attributes 'Implementation-Title': 'FITS Tester',
+                  'Implementation-Version': version,
+                  'Built-By': System.getProperty('user.name'),
+                  'Built-Date': new Date(),
+                  'Built-JDK': System.getProperty('java.version'),
+                  'Built-Gradle': gradle.gradleVersion,
+		  'Class-Path': '.',
+	          'Main-Class': 'edu.harvard.hul.ois.fits.FitsTester_MainGui'
+    }
+}
+
+// TODO: Do we need this?
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
+}
+
+// Generate the ZIP distribution
+task dist(type:Zip, overwrite:true){
+    archiveName "$baseName-$version-bin.zip"
+    
+    // Include the jar file
+    from jar.outputs.files
+    
+    // Include several necessary files
+    from('fits_tester.properties')
+    from('log4j.properties')
+    from('runTester.bat')
+    from('runTester.sh')
+
+    // Include the lib folder in the zip file
+    into( 'lib' ) {
+	from './lib/'
+    }
+}
