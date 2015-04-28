@@ -1,7 +1,7 @@
 package edu.harvard.hul.ois.fits
 
 //
-// Singleton Groovy Class to read the P4P Properties file
+// Singleton Groovy Class to read the FITS Tester Properties file
 //
 //
 
