@@ -6,5 +6,5 @@ Expected results are to be located in the following:
 TODO:
 
 - Use Error Log file
-- Refactor and cleanup newly added XMLUnit capabilities
 - Add more logging
+- use enum in a better way

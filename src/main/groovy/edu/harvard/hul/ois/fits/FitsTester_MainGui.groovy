@@ -54,11 +54,11 @@ class FitsTester_MainGui {
 			BorderLayout()) {
 
 				menuBar {
-					menu(text:'Tools') {
-						menuItem() {
-							//action(name:'Create Expected Results',this.&showCreateTestsDialog)
-						}
-					}
+					//menu(text:'Tools') {
+					//	menuItem() {
+					//		//action(name:'Create Expected Results',this.&showCreateTestsDialog)
+					//	}
+					//}
 					menu(text:'Help') {
 						menuItem() {
 							action(name:'About', closure:{ showAbout() })
@@ -111,7 +111,9 @@ class FitsTester_MainGui {
 								label 'Output Type:'
 							}
 							td {
-								comboBox(id: 'outputType', items:["FITS", "Standard", "Combo"], 
+								//comboBox(id: 'outputType', items:["FITS", "Standard", "Combo"], 
+								//	selectedIndex:1);
+								comboBox(id: 'outputType', items:OutputType.values(),
 									selectedIndex:1);
 							}
 						}
@@ -197,7 +199,7 @@ class FitsTester_MainGui {
 			if (selected.equals("Standard")) {
 				fileTypeArg = STANDARD_ARG
 		    }
-			else if (selected.equals("Combo")) {
+			else if (selected.equals("Combined")) {
 				fileTypeArg = COMBO_ARG
 			}
 			
@@ -245,65 +247,24 @@ class FitsTester_MainGui {
 					// Now do the XML comparison					
 					if(fileOutputCompareOn.selected) {				
 
-						// TODO: Select the actual FITS output type
-						String fileTypePrefix = "Standard"
+						// Select the output subfolder based on the output type
+						// TODO: verify the below config settings BEFORE using them
+						def standardFolder = config.test.fits.expected.Standard.folder
+						def fitsFolder = config.test.fits.expected.Fits.folder
+						def comboFolder = config.test.fits.expected.Combo.folder
+						String fileTypePrefix = standardFolder
+						if (selected.equalsIgnoreCase("Fits")) {
+							fileTypePrefix = fitsFolder
+						}
+						else if (selected.equalsIgnoreCase("Combined")) {
+							fileTypePrefix = comboFolder
+						}
 						
-						TestUtil app = new TestUtil()
 						textArea.append(newline + "Beginning the XMLUnit file comparison${newline}")
 						
-						filesToTest.each { file ->			
-	
-							def fileOrDirMsg = "File"
-							if (file.isDirectory()) {
-								fileOrDirMsg = "Folder"
-							}
-							textArea.append("Comparing ${fileOrDirMsg} ${file.name}${newline}")
-							
-							//test.fits.expected.root.dir=/Users/dab980/documents/FITS_Test/FITS_Test_Expected
-							//test.fits.expected.Fits.folder=FITS
-							//test.fits.expected.Standard.folder=Standard
-							//test.fits.expected.Combo.folder=Combo
-							
-							def expectedDirPath = config.test.fits.expected.root.dir
-								// + "/"  + 
-								// config.test.fits.expected.Standard.folder
-
-							List<NonMatchingResult> errResults = 
-								app.compareXmlInFileOrFolder(
-									file, fileTypePrefix,
-									testOutputDirField.text,
-									expectedDirPath)
-							
-							if (errResults.size() == 0) {
-								textArea.append("${tab}Success for XML Results comparison ${fileOrDirMsg} ${file.name}${newline}")
-							}
-							else {
-								textArea.append("${tab}Number of Errors for ${fileOrDirMsg} ${file.name}: " + errResults.size() + 
-									"${newline}")
-							}
-							
-							// Handle Differences >>>
-							// Interate Each Error and report
-							errResults.each () { diff ->
-					
-								DetailedDiff detailedDiff = diff.detailedDiff
-					
-								// Display any Differences
-								List<Difference> diffs = detailedDiff.getAllDifferences();
-								StringBuffer differenceDescription = new StringBuffer();
-								differenceDescription.append(diffs.size()).append(" differences");
-					
-								System.out.println(differenceDescription.toString());
-								for(Difference difference : diffs) {
-									System.out.println(difference.toString());
-									log.error (difference.toString())
-								}
-							}
-							
-							// <<<
-							
-							
-						} // filesToTest.each
+						filesToTest.each { file ->								
+							compareResults(file, fileTypePrefix, testOutputDirField.text)	
+						}
 							
 
 					} // if(fileOutputCompareOn.selected)
@@ -424,6 +385,54 @@ class FitsTester_MainGui {
 
 		
 	} // callFits()
+		
+	void compareResults(File file, String fileTypePrefix, String testOutputDirField) {
+		def fileOrDirMsg = "File"
+		if (file.isDirectory()) {
+			fileOrDirMsg = "Folder"
+		}
+		textArea.append("Comparing ${fileOrDirMsg} ${file.name}${newline}")
+		
+		TestUtil app = new TestUtil()
+		
+		def expectedDirPath = config.test.fits.expected.root.dir
+			// + "/"  +
+			// config.test.fits.expected.Standard.folder
+
+		List<NonMatchingResult> errResults =
+			app.compareXmlInFileOrFolder(
+				file, fileTypePrefix,
+				testOutputDirField,
+				expectedDirPath)
+		
+		if (errResults.size() == 0) {
+			textArea.append("${tab}Success for XML Results comparison ${fileOrDirMsg} ${file.name}${newline}")
+		}
+		else {
+			textArea.append("${tab}Number of Errors for ${fileOrDirMsg} ${file.name}: " + errResults.size() +
+				"${newline}")
+		}
+		
+		// Handle Differences >>>
+		// Interate Each Error and report
+		errResults.each () { diff ->
+
+			DetailedDiff detailedDiff = diff.detailedDiff
+
+			// Display any Differences
+			List<Difference> diffs = detailedDiff.getAllDifferences();
+			StringBuffer differenceDescription = new StringBuffer();
+			differenceDescription.append(diffs.size()).append(" differences");
+
+			System.out.println(differenceDescription.toString());
+			for(Difference difference : diffs) {
+				System.out.println(difference.toString());
+				log.error (difference.toString())
+			}
+		}
+		
+		// <<<
+	}
 
 	
 	void showAbout() {
