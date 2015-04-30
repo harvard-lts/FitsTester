@@ -146,6 +146,8 @@ class FitsTester_MainGui {
 			chooser.setMultiSelectionEnabled(true)
 			chooser.showOpenDialog(frame)
 
+			// Clear the text area, as this is a new run
+			textArea.setText(null);
 			textArea.append("${newline}Selected files or folder to process: ${newline}")
 			chooser.getSelectedFiles().each {
 				filesToTest.add(it)
@@ -223,12 +225,33 @@ class FitsTester_MainGui {
 						JOptionPane.WARNING_MESSAGE);
 				return
 			}
+			
+			// If input directory is a folder, the output location must be
+			// Set and a directory
+			if(!fileOutputOn.selected) {
+				int numFolders = 0
+				filesToTest.each { file ->
+					if (file.isDirectory() ) {
+						numFolders++
+					}
+				}
+				if(numFolders > 0) {
+					JOptionPane.showMessageDialog(null,
+						"When FITS is run in directory processing mode. " +
+						"\"Enable output to file\" must be selected.",
+						"Invalid selection",
+						JOptionPane.ERROR_MESSAGE);
+					return
+				}
+			} // not file output
+
 
 			// Path to FITS script or batch file
 			def FITS_DIR = config.test.fits.install.dir
 			def FITS_PROG = config.test.fits.runner
 			def fitsScriptFile = new File("${FITS_DIR}/${FITS_PROG}");
-						
+
+			
 			//try {
 					
 				// Separate thread outside the EDT
@@ -239,8 +262,12 @@ class FitsTester_MainGui {
 							fileOutputOn.selected, testOutputDirField.text)
 					} // filesToTest.each
 	
-					// Now do the XML comparison					
-					if(fileOutputCompareOn.selected) {				
+					// Now do the XML comparison, but only if
+					// BOTH of the following are checked
+					// 1) 'Enable output to file' is checked
+					//   and
+					// 2) 'Compare Actual Output XML to Expected files'	
+					if(fileOutputOn.selected && fileOutputCompareOn.selected) {				
 
 						// Select the output subfolder based on the output type
 						// TODO: verify the below config settings BEFORE using them
@@ -314,6 +341,7 @@ class FitsTester_MainGui {
 					fileToProcess.name + ".xml"
 			}
 		}
+
 		// DEBUG
 		// println "Arg for output file: ${outputToFileSwitch} ${outputFileName}"
 		
@@ -333,7 +361,7 @@ class FitsTester_MainGui {
 		pb.directory(runDir);
 
 		// Redirect the error stream (merging both both std out and error stream)
-//		pb.redirectErrorStream(true)
+		pb.redirectErrorStream(true)
 		
 		//
 		// TODO: Redirect the output to the GUI's TextArea
@@ -349,19 +377,20 @@ class FitsTester_MainGui {
 
 		// --------------------------------------------------------------------
 		// Handle the output stream (both std out and error stream are merged)
+		// ONLY If we are not outputting to a file
 		// --------------------------------------------------------------------
-		InputStreamReader isr = new  InputStreamReader(process.getInputStream());
-		BufferedReader br = new BufferedReader(isr);
-		String lineRead;
-
-		while ((lineRead = br.readLine()) != null) {
-			// swallow the line, or print it out
-			//if (LOG_PROCESSOR.toLowerCase().equals("true")) {
-			//	log.info lineRead
-			//}
-			println lineRead
-			textArea.append(lineRead)
+		if(!outputToFile) {
+			InputStreamReader isr = new  InputStreamReader(process.getInputStream())
+			BufferedReader br = new BufferedReader(isr)
+			String lineRead
+	
+			while ((lineRead = br.readLine()) != null) {
+				log.info "FITS_OUT_STREAM >>> " + lineRead
+				println "FITS_OUT_STREAM >>> " + lineRead
+				textArea.append("FITS_OUT_STREAM >>> ${lineRead}${newline}")
+			}
 		}
+
 		// --------------------------------------------------------------------
 
 		// 0 indicates normal termination
