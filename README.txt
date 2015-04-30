@@ -5,6 +5,6 @@ Expected results are to be located in the following:
 
 TODO:
 
-- Use Error Log file
-- Add more logging
+- capture FITS standard output
 - use enum in a better way
+- Write an actual user's guide and config doc

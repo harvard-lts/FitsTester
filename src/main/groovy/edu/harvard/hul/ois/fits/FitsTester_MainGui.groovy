@@ -54,11 +54,6 @@ class FitsTester_MainGui {
 			BorderLayout()) {
 
 				menuBar {
-					//menu(text:'Tools') {
-					//	menuItem() {
-					//		//action(name:'Create Expected Results',this.&showCreateTestsDialog)
-					//	}
-					//}
 					menu(text:'Help') {
 						menuItem() {
 							action(name:'About', closure:{ showAbout() })
@@ -75,7 +70,7 @@ class FitsTester_MainGui {
 					tableLayout {
 						tr {
 							td { // text property is default, so it is implicit.
-								label 'Select Files to Test:'
+								label 'Select Files or a Folder to Test:'
 							}
 							td{
 								button("...", actionPerformed: this.&selectFilesForTest)
@@ -392,12 +387,11 @@ class FitsTester_MainGui {
 			fileOrDirMsg = "Folder"
 		}
 		textArea.append("Comparing ${fileOrDirMsg} ${file.name}${newline}")
+		log.info("Comparing ${fileOrDirMsg} ${file.name}")
 		
-		TestUtil app = new TestUtil()
+		TestUtil app = new TestUtil(textArea)
 		
 		def expectedDirPath = config.test.fits.expected.root.dir
-			// + "/"  +
-			// config.test.fits.expected.Standard.folder
 
 		List<NonMatchingResult> errResults =
 			app.compareXmlInFileOrFolder(
@@ -407,13 +401,16 @@ class FitsTester_MainGui {
 		
 		if (errResults.size() == 0) {
 			textArea.append("${tab}Success for XML Results comparison ${fileOrDirMsg} ${file.name}${newline}")
+			log.info("Success for XML Results comparison ${fileOrDirMsg}")
 		}
 		else {
 			textArea.append("${tab}Number of Errors for ${fileOrDirMsg} ${file.name}: " + errResults.size() +
 				"${newline}")
+			log.info("Number of Errors for ${fileOrDirMsg} ${file.name}: " + errResults.size())
+			log.error("Number of Errors for ${fileOrDirMsg} ${file.name}: " + errResults.size())
 		}
 		
-		// Handle Differences >>>
+		// Handle Differences if they exist
 		// Interate Each Error and report
 		errResults.each () { diff ->
 
@@ -431,10 +428,8 @@ class FitsTester_MainGui {
 			}
 		}
 		
-		// <<<
-	}
+	} // compareResults
 
-	
 	void showAbout() {
 		JOptionPane.showMessageDialog(null,
 			'This is the FITS Testing Application',
