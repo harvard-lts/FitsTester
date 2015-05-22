@@ -22,7 +22,7 @@ class ConfigReader {
 	}
 	
     public ConfigObject getConfig() { 
-        return this.config;
+        this.config
     }
 
 }

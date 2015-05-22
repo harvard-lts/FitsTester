@@ -79,7 +79,7 @@ class FitsTester_MainGui {
 						
 						tr {
 							td {
-								label 'Test Output Directory:'
+								label 'FITS Run Output Directory:'
 							}
 							td {
 								textField testOutputDir, id: 'testOutputDirField', columns: 40
@@ -103,13 +103,13 @@ class FitsTester_MainGui {
 						
 						tr {
 							td {
-								label 'Output Type:'
+								label 'FITS Output Type:'
 							}
 							td {
 								//comboBox(id: 'outputType', items:["FITS", "Standard", "Combo"], 
-								//	selectedIndex:1);
+								//	selectedIndex:1)
 								comboBox(id: 'outputType', items:OutputType.values(),
-									selectedIndex:1);
+									selectedIndex:1)
 							}
 						}
 						
@@ -147,7 +147,7 @@ class FitsTester_MainGui {
 			chooser.showOpenDialog(frame)
 
 			// Clear the text area, as this is a new run
-			textArea.setText(null);
+			textArea.setText(null)
 			textArea.append("${newline}Selected files or folder to process: ${newline}")
 			chooser.getSelectedFiles().each {
 				filesToTest.add(it)
@@ -200,12 +200,45 @@ class FitsTester_MainGui {
 				fileTypeArg = COMBO_ARG
 			}
 			
+			// Initialize these once
+			def expectedDirPath = config.test.fits.expected.root.dir
+			def standardFolder = config.test.fits.expected.Standard.folder
+			def fitsFolder = config.test.fits.expected.Fits.folder
+			def comboFolder = config.test.fits.expected.Combo.folder
+			
+			// Verify the folder location of the "Expected" files
+			if(fileOutputOn.selected && fileOutputCompareOn.selected) {
+				
+				// TODO: only initialize these once
+				//def standardFolder = config.test.fits.expected.Standard.folder
+				//def fitsFolder = config.test.fits.expected.Fits.folder
+				//def comboFolder = config.test.fits.expected.Combo.folder
+				String fileTypePrefix = standardFolder
+				if (selected.equalsIgnoreCase("Fits")) {
+					fileTypePrefix = fitsFolder
+				}
+				else if (selected.equalsIgnoreCase("Combined")) {
+					fileTypePrefix = comboFolder
+				}
+				
+				def expectedPath = "${expectedDirPath}/${fileTypePrefix}"
+				File expectedFolder = new File(expectedPath)
+				if( !expectedFolder.exists() ) {
+					JOptionPane.showMessageDialog(null,
+						"The Test Expected input Directory ${expectedPath} does not exist.\n " +
+						"Please revise the location of the expected test files in fits_tester.properties and try again.",
+						"Directory Not Found",
+						JOptionPane.ERROR_MESSAGE)
+					return
+				}
+			}
+			
 			//println filesToTest.size
 			if (filesToTest.size < 1) {
 				JOptionPane.showMessageDialog(null,
 					"Please select some files to test.",
 					"Test Files Specified",
-					JOptionPane.WARNING_MESSAGE);
+					JOptionPane.WARNING_MESSAGE)
 				return
 			}
 			
@@ -213,16 +246,16 @@ class FitsTester_MainGui {
 				JOptionPane.showMessageDialog(null,
 					"Please specify the Test Output Directory.",
 					"Directory Not Specified",
-					JOptionPane.WARNING_MESSAGE);
+					JOptionPane.WARNING_MESSAGE)
 				return
 			}
 
-			File f1 = new File(testOutputDirField.text);
+			File f1 = new File(testOutputDirField.text)
 			if(!f1.exists()) {
 				JOptionPane.showMessageDialog(null,
 						"The Test Output Directory does not exist.",
 						"Directory Not Found",
-						JOptionPane.WARNING_MESSAGE);
+						JOptionPane.WARNING_MESSAGE)
 				return
 			}
 			
@@ -240,7 +273,7 @@ class FitsTester_MainGui {
 						"When FITS is run in directory processing mode. " +
 						"\"Enable output to file\" must be selected.",
 						"Invalid selection",
-						JOptionPane.ERROR_MESSAGE);
+						JOptionPane.ERROR_MESSAGE)
 					return
 				}
 			} // not file output
@@ -249,7 +282,7 @@ class FitsTester_MainGui {
 			// Path to FITS script or batch file
 			def FITS_DIR = config.test.fits.install.dir
 			def FITS_PROG = config.test.fits.runner
-			def fitsScriptFile = new File("${FITS_DIR}/${FITS_PROG}");
+			def fitsScriptFile = new File("${FITS_DIR}/${FITS_PROG}")
 
 			
 			//try {
@@ -271,9 +304,9 @@ class FitsTester_MainGui {
 
 						// Select the output subfolder based on the output type
 						// TODO: verify the below config settings BEFORE using them
-						def standardFolder = config.test.fits.expected.Standard.folder
-						def fitsFolder = config.test.fits.expected.Fits.folder
-						def comboFolder = config.test.fits.expected.Combo.folder
+						//def standardFolder = config.test.fits.expected.Standard.folder
+						//def fitsFolder = config.test.fits.expected.Fits.folder
+						//def comboFolder = config.test.fits.expected.Combo.folder
 						String fileTypePrefix = standardFolder
 						if (selected.equalsIgnoreCase("Fits")) {
 							fileTypePrefix = fitsFolder
@@ -353,12 +386,12 @@ class FitsTester_MainGui {
 		
 		ProcessBuilder pb = new ProcessBuilder(fitsFile.getAbsolutePath(),
 			"-i", fileToProcess.getAbsolutePath(), outputType, 
-			outputToFileSwitch, outputFileName);
+			outputToFileSwitch, outputFileName)
 
 		// Set the working directory. The program will run as if you are in this
 		// directory.
 		def runDir = new File(fitsDir)
-		pb.directory(runDir);
+		pb.directory(runDir)
 
 		// Redirect the error stream (merging both both std out and error stream)
 		pb.redirectErrorStream(true)
@@ -373,7 +406,7 @@ class FitsTester_MainGui {
 		//pb.environment().put("isTestData", IS_TEST)
 
 		// Start the process and wait for it to finish.
-		final Process process = pb.start();
+		final Process process = pb.start()
 
 		// --------------------------------------------------------------------
 		// Handle the output stream (both std out and error stream are merged)
@@ -446,13 +479,13 @@ class FitsTester_MainGui {
 			DetailedDiff detailedDiff = diff.detailedDiff
 
 			// Display any Differences
-			List<Difference> diffs = detailedDiff.getAllDifferences();
-			StringBuffer differenceDescription = new StringBuffer();
-			differenceDescription.append(diffs.size()).append(" differences");
+			List<Difference> diffs = detailedDiff.getAllDifferences()
+			StringBuffer differenceDescription = new StringBuffer()
+			differenceDescription.append(diffs.size()).append(" differences")
 
-			System.out.println(differenceDescription.toString());
+			System.out.println(differenceDescription.toString())
 			for(Difference difference : diffs) {
-				System.out.println(difference.toString());
+				System.out.println(difference.toString())
 				log.error (difference.toString())
 			}
 		}
@@ -461,7 +494,7 @@ class FitsTester_MainGui {
 
 	void showAbout() {
 		JOptionPane.showMessageDialog(null,
-			'This is the FITS Testing Application',
+			'This is the FITS Testing Application.',
 			'About',
 			JOptionPane.INFORMATION_MESSAGE)
 	}
