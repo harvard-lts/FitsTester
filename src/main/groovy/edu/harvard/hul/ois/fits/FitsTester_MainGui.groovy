@@ -318,15 +318,25 @@ class FitsTester_MainGui {
 			def FITS_DIR = config.test.fits.install.dir
 			def FITS_PROG = config.test.fits.runner
 			def fitsScriptFile = new File("${FITS_DIR}/${FITS_PROG}")
-
 			
+			
+			// Verify the FITS directory exists before going any further
+			def runDir = new File(FITS_DIR)
+			if( !runDir.exists() ) {
+				JOptionPane.showMessageDialog(null,
+					"FITS directory ${runDir.absolutePath} does not exist. ",
+					"FITS Installation missing",
+					JOptionPane.ERROR_MESSAGE)
+				return
+			}
+		
 			//try {
 					
 				// Separate thread outside the EDT
 				doOutside {
 						
 					filesToTest.each { file ->
-						callFits(fitsScriptFile, file, FITS_DIR, fileTypeArg,
+						callFits(fitsScriptFile, file, runDir, fileTypeArg,
 							fileOutputOn.selected, testOutputDirField.text, isRecursive)
 					} // filesToTest.each
 	
@@ -375,7 +385,7 @@ class FitsTester_MainGui {
 		} // swing.with
 	}
 	
-	void callFits(File fitsFile, File fileToProcess, String fitsDir, String outputType, 
+	void callFits(File fitsFile, File fileToProcess, def runDir, String outputType, 
 		boolean outputToFile, String outputDirPath, def isRecursive) {
 		
 		// --------------------------------------------------------------------
@@ -435,7 +445,6 @@ class FitsTester_MainGui {
 
 		// Set the working directory. The program will run as if you are in this
 		// directory.
-		def runDir = new File(fitsDir)
 		pb.directory(runDir)
 
 		// Redirect the error stream (merging both both std out and error stream)
