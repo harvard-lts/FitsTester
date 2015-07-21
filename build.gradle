@@ -1,7 +1,7 @@
 apply plugin: 'groovy'
 //apply plugin: 'eclipse'
 
-version = 1.0
+version = 0.1
 
 dependencies {
 	// this includes all the files under 'lib' at compile time
@@ -45,7 +45,6 @@ jar {
     }
 }
 
-// TODO: Do we need this?
 task wrapper(type: Wrapper) {
     gradleVersion = '2.0'
 }

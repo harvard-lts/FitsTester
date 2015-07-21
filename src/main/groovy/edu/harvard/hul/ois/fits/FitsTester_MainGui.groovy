@@ -1,3 +1,21 @@
+/*
+ * Copyright 2015 Harvard University Library
+ *
+ * This file is part of FITS (File Information Tool Set).
+ *
+ * FITS is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FITS is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FITS.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package edu.harvard.hul.ois.fits
 
 import groovy.swing.SwingBuilder
@@ -76,7 +94,13 @@ class FitsTester_MainGui {
 								button("...", actionPerformed: this.&selectFilesForTest)
 							}
 						}
-						
+
+						tr {
+							td {
+								checkBox(id: 'isRecursive', text: 'Recurse Selected Directory', visible: false)
+							}
+						}
+												
 						tr {
 							td {
 								label 'FITS Run Output Directory:'
@@ -100,7 +124,7 @@ class FitsTester_MainGui {
 								checkBox(id: 'fileOutputCompareOn', text: 'Compare Actual Output XML to Expected files')
 							}
 						}
-						
+
 						tr {
 							td {
 								label 'FITS Output Type:'
@@ -149,6 +173,17 @@ class FitsTester_MainGui {
 			// Clear the text area, as this is a new run
 			textArea.setText(null)
 			textArea.append("${newline}Selected files or folder to process: ${newline}")
+			
+			// If we select a directory track it and show checkbox
+			if(chooser.getSelectedFile().isDirectory()) {
+				//System.out.println("Got Directory")
+				isRecursive.visible = true
+			}
+			else {
+				isRecursive.visible = false
+				isRecursive.selected = false
+			}
+				
 			chooser.getSelectedFiles().each {
 				filesToTest.add(it)
 				// DEBUG
@@ -292,7 +327,7 @@ class FitsTester_MainGui {
 						
 					filesToTest.each { file ->
 						callFits(fitsScriptFile, file, FITS_DIR, fileTypeArg,
-							fileOutputOn.selected, testOutputDirField.text)
+							fileOutputOn.selected, testOutputDirField.text, isRecursive)
 					} // filesToTest.each
 	
 					// Now do the XML comparison, but only if
@@ -341,7 +376,7 @@ class FitsTester_MainGui {
 	}
 	
 	void callFits(File fitsFile, File fileToProcess, String fitsDir, String outputType, 
-		boolean outputToFile, String outputDirPath) {
+		boolean outputToFile, String outputDirPath, def isRecursive) {
 		
 		// --------------------------------------------------------------------
 		// Create a Process Builder object
@@ -352,6 +387,7 @@ class FitsTester_MainGui {
 		// Default output file params to empty strings
 		def outputFileName = ""
 		def outputToFileSwitch = ""
+		def isRecursiveSwitch = ""
 		
 		def fileOrDirMsg = "File"
 		if(outputToFile) {
@@ -368,6 +404,10 @@ class FitsTester_MainGui {
 			if (fileToProcess.isDirectory()) {
 				outputFileName =  outputDirPath
 				fileOrDirMsg = "Folder"
+				
+				if(isRecursive.selected) {
+					isRecursiveSwitch = "-r"
+				}
 			}
 			else {
 				outputFileName =  outputDirPath + "/" +
@@ -382,10 +422,15 @@ class FitsTester_MainGui {
 		textArea.append("${newline}${fileOrDirMsg} to process by FITS is: ${fileToProcess}${newline}")
 		log.info ("${fileOrDirMsg} to process by FITS is: ${fileToProcess}")
 		
+		if(isRecursive.selected) {
+			textArea.append("Folder will be processed Recursively${newline}")
+			log.info("Folder will be processed Recursively${newline}")
+		}
+		
 		textArea.append("Processing ... Please wait ...${newline}")
 		
 		ProcessBuilder pb = new ProcessBuilder(fitsFile.getAbsolutePath(),
-			"-i", fileToProcess.getAbsolutePath(), outputType, 
+			"-i", fileToProcess.getAbsolutePath(), outputType, isRecursiveSwitch,
 			outputToFileSwitch, outputFileName)
 
 		// Set the working directory. The program will run as if you are in this
