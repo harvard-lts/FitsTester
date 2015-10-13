@@ -12,6 +12,9 @@ runClApp.bat
 			-c
 			-i /Users/dab980/Documents/video/FITS-VIDEO-SAMPLE-FILES/FITS-SAMPLE-26.mov
 				/Users/dab980/Documents/video/FITS-VIDEO-SAMPLE-FILES_wip"
+			
+			// for recusive call to folders
+			-r
 				
 			// No command line arguments, FITS output ONLY
 			//
@@ -31,6 +34,7 @@ usage: fits
  -h         print this message
  -i <arg>   input file or directory
  -o <arg>   output directory
+ -r         recurse input directory (if it is a directory)
  -x         convert FITS output to a standard metadata schema
  -xc        output using a standard metadata schema and include FITS xml
  
@@ -38,12 +42,11 @@ usage: fits
  -c
  -d
  -h
+ -r
  
  NOTE:
  
  The -o argument MUST BE A DIRECTORY. This is the root directory for output files.
  The subfolders will be preserved. Currently, this runs recursively by default and ONLY runs recursively
  
- TODO:
- 
- Bring back the -r option so the user can decide if the files will be run in a recursive manner.
+ The -r argument will only matter if -i is a directory

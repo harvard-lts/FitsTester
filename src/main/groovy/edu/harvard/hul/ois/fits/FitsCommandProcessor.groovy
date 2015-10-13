@@ -1,6 +1,7 @@
 package edu.harvard.hul.ois.fits
 
 import java.io.File
+import groovy.io.FileType
 
 import org.apache.commons.cli.CommandLine
 import org.apache.commons.cli.CommandLineParser
@@ -38,6 +39,7 @@ class FitsCommandProcessor {
 		Options options = new Options()
 		options.addOption( "i", true, "input file or directory" )
 		options.addOption( "o", true, "output directory" );
+		options.addOption( "r", false, "recurse input directory (if it is a directory)" );
 		options.addOption( "h", false, "print this message" )
 		options.addOption( "d", false, "debug command line arguments and properties" )
 		options.addOption( "c", false, "compare the actual output with expected output" )
@@ -80,10 +82,13 @@ class FitsCommandProcessor {
 			printHelp( options )
 			System.exit(-1)
 		}
+		
+		boolean doRecurse = false
+		if(cmd.hasOption( "r" )) {
+			doRecurse = true
+		}
 
-		// HACK for test
 		boolean doOutputCompare = false
-		// boolean doOutputCompare = false
 		if(cmd.hasOption( "c" )) {
 			doOutputCompare = true
 		}
@@ -95,10 +100,20 @@ class FitsCommandProcessor {
 		
 		if (startFolderOrFile.directory) {
 			String startFolderStr = startFolderOrFile.absolutePath
-			startFolderOrFile.eachFileRecurse {fileOrFolder ->
-				app.processFileOrFolder(fileOrFolder, outputRoot, outputTypeStr, startFolderStr, doOutputCompare)
+			
+			if(doRecurse == true) {
+				startFolderOrFile.eachFileRecurse {fileOrFolder ->
+					app.processFileOrFolder(fileOrFolder, outputRoot, outputTypeStr, 
+						startFolderStr, doOutputCompare)
+				}
 			}
-		}
+			else {	// no recursion, only process files
+				startFolderOrFile.eachFile(FileType.FILES){ fileToProcess ->
+					app.processFileOrFolder(fileToProcess, outputRoot, outputTypeStr,
+						startFolderStr, doOutputCompare)
+				}
+			}
+		}	// isDirectory
 		else {
 			String startFolderString = startFolderOrFile.absolutePath
 			app.processFileOrFolder(startFolderOrFile, outputRoot, outputTypeStr, startFolderString, doOutputCompare)
