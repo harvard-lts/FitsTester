@@ -77,6 +77,15 @@ class TestUtil {
 	}
 	
 	public String readFile(File file) {
+		
+		// TODO:
+		// Should we check the file up higher, or just let it fail here	
+		if (!file.exists()) {
+			println "ERROR: ${file} does not exist"
+			throw new Exception("File does not exist")
+			//System(-1)
+		}
+		
 		Scanner scan = new Scanner(file)
 		String xmlStr = scan.
 				useDelimiter("\\Z").next()
@@ -112,12 +121,16 @@ class TestUtil {
 		log.info("Comparing ${expectedXmlFileName} to ${actualXmlFileName}")
 		if(textArea != null)
 			textArea.append("Comparing ${expectedXmlFileName} to ${actualXmlFileName}")
+		else
+			println "Comparing ${expectedXmlFileName} to ${actualXmlFileName}"
 		
 		Diff diff = compareXmlFiles(new File(expectedXmlFileName), new File(actualXmlFileName))
 		println "Is Identical: " + diff.identical()
 		log.info("Is Identical: " + diff.identical())
 		if(textArea != null)
 			textArea.append("Is Identical: " + diff.identical())
+		else
+			println "Is Identical: " + diff.identical()
 
 		if (!diff.identical()) {	// add to diffList
 

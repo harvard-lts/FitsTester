@@ -42,11 +42,11 @@ class FitsTester_MainGui {
 	String testOutputDir
 	def filesToTest = new ArrayList<File>()
 	def textArea
-	def newline = "\n"
-	def tab = "\t"
+	public static final String newline = "\n"
+	public static final String tab = "\t"
 	
-	def STANDARD_ARG = "-x"
-	def COMBO_ARG = "-xc"
+	public static final String STANDARD_ARG = "-x"
+	public static final String COMBO_ARG = "-xc"
 	
 	// Read Data from the config file
 	// Get an instance of the configReaderSingleton class

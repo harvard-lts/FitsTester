@@ -1,0 +1,49 @@
+Sample call:
+
+
+./runClApp.sh -d -c -i /Users/dab980/Documents/video/FITS-VIDEO-SAMPLE-FILES_wip -xc -o /Users/dab980/documents/FITS_TEST/output_wip
+
+./runClApp.sh
+OR
+runClApp.bat
+
+
+			-d
+			-c
+			-i /Users/dab980/Documents/video/FITS-VIDEO-SAMPLE-FILES/FITS-SAMPLE-26.mov
+				/Users/dab980/Documents/video/FITS-VIDEO-SAMPLE-FILES_wip"
+				
+			// No command line arguments, FITS output ONLY
+			//
+			// -xc --> Outputs the FITS output plus the FITS output transformed into standard XML schemas
+			"-xc",
+			//
+			// -x --> Transforms the FITS output into standard XML schemas (EBUCore)
+			//"-x",
+			
+			-o /Users/dab980/documents/FITS_TEST/output_wip
+			
+Below are the command meanings
+
+usage: fits
+ -c         compare the actual output with expected output
+ -d         debug command line arguments and properties
+ -h         print this message
+ -i <arg>   input file or directory
+ -o <arg>   output directory
+ -x         convert FITS output to a standard metadata schema
+ -xc        output using a standard metadata schema and include FITS xml
+ 
+ OPTIONAL params:
+ -c
+ -d
+ -h
+ 
+ NOTE:
+ 
+ The -o argument MUST BE A DIRECTORY. This is the root directory for output files.
+ The subfolders will be preserved. Currently, this runs recursively by default and ONLY runs recursively
+ 
+ TODO:
+ 
+ Bring back the -r option so the user can decide if the files will be run in a recursive manner.

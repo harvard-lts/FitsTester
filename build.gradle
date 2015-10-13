@@ -1,7 +1,7 @@
 apply plugin: 'groovy'
 //apply plugin: 'eclipse'
 
-version = 0.1
+version = 0.2
 
 dependencies {
 	// this includes all the files under 'lib' at compile time
@@ -59,8 +59,10 @@ task dist(type:Zip, overwrite:true){
     // Include several necessary files
     from('fits_tester.properties')
     from('log4j.properties')
-    from('runTester.bat')
-    from('runTester.sh')
+    from('runClApp.bat')
+    from('runClApp.sh')
+	from('runTester.bat')
+	from('runTester.sh')
 
     // Include the lib folder in the zip file
     into( 'lib' ) {
