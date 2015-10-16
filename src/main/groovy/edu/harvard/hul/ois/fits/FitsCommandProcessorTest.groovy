@@ -13,8 +13,8 @@ class FitsCommandProcessorTest {
 
 			"-i",
 			
-			//"/Users/dab980/Documents/video/FITS-VIDEO-SAMPLE-FILES/FITS-SAMPLE-26.mov",
-			"/Users/dab980/Documents/video/FITS-VIDEO-SAMPLE-FILES_wip",
+			"/Users/dab980/Documents/video/FITS-VIDEO-SAMPLE-FILES/FITS-SAMPLE-26.mov",
+			//"/Users/dab980/Documents/video/FITS-VIDEO-SAMPLE-FILES_wip",
 			// No command line arguments, FITS output ONLY
 			//
 			// -xc --> Outputs the FITS output plus the FITS output transformed into standard XML schemas

@@ -111,6 +111,7 @@ class TestUtil {
 				"fitsExecutionTime",
 				"executionTime",
 				"filepath",
+				"ebucore:locator",
 				"location"));
 			
 		return diff

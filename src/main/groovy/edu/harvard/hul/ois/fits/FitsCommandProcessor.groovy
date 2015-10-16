@@ -219,6 +219,19 @@ class FitsCommandProcessor {
 			return  outputTypeLocal.FITS
 	}
 	
+	private static String getOutputCommand(String outputType) {
+		
+		switch (outputType) {
+			case "COMBINED":
+				return "-xc"
+			case "STANDARD":
+				return "-x"
+		}
+		
+		// outputTypeLocal.FITS
+		return ""
+	}
+	
 	public enum outputTypeLocal {
 		COMBINED, STANDARD, FITS
 	}
@@ -260,9 +273,10 @@ class FitsCommandProcessor {
 		log.info ("File to process by FITS is: ${fileToProcess}")
 		
 		println "Processing ... Please wait ..."
-		
+	
+		String outputCmd = getOutputCommand(outputTypeStr)	
 		ProcessBuilder pb = new ProcessBuilder(fitsFile.getAbsolutePath(),
-			"-i", fileToProcess.getAbsolutePath(), outputTypeStr,
+			"-i", fileToProcess.getAbsolutePath(), outputCmd,
 			outputToFileSwitch, outputFileName)
 
 		// Set the working directory. The program will run as if you are in this

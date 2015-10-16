@@ -38,11 +38,15 @@ public class IgnoreNamedElementsDifferenceListener implements DifferenceListener
     public int differenceFound(Difference difference) {
     	// If Element or attribute has name in the blackList, ignore differences
         if (difference.getId() == DifferenceConstants.TEXT_VALUE_ID) {
+			// DEBUG
+			// println difference.getControlNodeDetail().getNode().getParentNode().getNodeName()
             if (blackList.contains(difference.getControlNodeDetail().getNode().getParentNode().getNodeName())) {
                 return DifferenceListener.RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL
             }
         }
         else if (difference.getId() == DifferenceConstants.ATTR_VALUE_ID) {
+			// DEBUG
+			// println difference.getControlNodeDetail().getNode().getNodeName()
             if (blackList.contains(difference.getControlNodeDetail().getNode().getNodeName())) {
                 return DifferenceListener.RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL
             }
