@@ -1,5 +1,8 @@
 .gradle
+
+# built files
 /bin/
+/build/tmp/
 
 # Java class files
 *.class
