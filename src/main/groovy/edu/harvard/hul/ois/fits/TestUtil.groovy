@@ -39,7 +39,7 @@ class TestUtil {
 	}
 	
 	public List<NonMatchingResult> compareXmlInFileOrFolder(File fileToProcess, String outputType,
-		String outputDirPath, String expectedDirPath) {
+		String outputDirPath, String expectedDirPath, String ...ignoreList) {
 		
 		String actualXmlFileName
 		String expectedXmlFileName
@@ -60,20 +60,20 @@ class TestUtil {
 					// list << file
 					expectedXmlFileName = "${expectedDirPath}/${outputType}/${file.name}" + ".xml"
 					actualXmlFileName = "${outputDirPath}/${file.name}" + ".fits.xml"
-					doDiff(actualXmlFileName, expectedXmlFileName, diffList)
+					doDiff(actualXmlFileName, expectedXmlFileName, diffList, ignoreList)
 				} // !".DS_Store"				
 			} // fileToProcess.eachFileRecurse 
 		}
 		else {
 			expectedXmlFileName = "${expectedDirPath}/${outputType}/${fileToProcess.name}" + ".xml"
 			actualXmlFileName = "${outputDirPath}/${fileToProcess.name}" + ".xml"
-			doDiff(actualXmlFileName, expectedXmlFileName, diffList)
+			doDiff(actualXmlFileName, expectedXmlFileName, diffList, ignoreList)
 		}
 		return diffList
 	}
 
-	public Diff compareXmlFiles(File expectedXmlFile, File actualXmlFile) {
-		return compareXmlStrings(readFile(expectedXmlFile), readFile(actualXmlFile))
+	public Diff compareXmlFiles(File expectedXmlFile, File actualXmlFile, String ...ignoreList) {
+		return compareXmlStrings(readFile(expectedXmlFile), readFile(actualXmlFile), ignoreList)
 	}
 	
 	public String readFile(File file) {
@@ -93,7 +93,7 @@ class TestUtil {
 		return xmlStr
 	}
 	
-	public Diff compareXmlStrings(String expectedXmlStr, String actualXmlStr) {
+	public Diff compareXmlStrings(String expectedXmlStr, String actualXmlStr, String ...ignoreList) {
 		// Set up XMLUnit
 		XMLUnit.setIgnoreWhitespace(true);
 		XMLUnit.setNormalizeWhitespace(true);
@@ -102,34 +102,25 @@ class TestUtil {
 
 		// Initialize attributes or elements to ignore for difference checking
 		diff.overrideDifferenceListener(new IgnoreNamedElementsDifferenceListener(
-				"toolversion",
-				"dateModified",
-				"fslastmodified",
-				"startDate",
-				"startTime",
-				"timestamp",
-				"fitsExecutionTime",
-				"executionTime",
-				"filepath",
-				"ebucore:locator",
-				"location"));
+			ignoreList));
 			
 		return diff
 	}
 	
-	private void doDiff(String actualXmlFileName, String expectedXmlFileName, List<NonMatchingResult> diffList) {
+	private void doDiff(String actualXmlFileName, String expectedXmlFileName, List<NonMatchingResult> diffList,
+		String ...ignoreList) {
 		println "Comparing ${expectedXmlFileName} to ${actualXmlFileName}"
 		log.info("Comparing ${expectedXmlFileName} to ${actualXmlFileName}")
 		if(textArea != null)
-			textArea.append("Comparing ${expectedXmlFileName} to ${actualXmlFileName}")
+			textArea.append("Comparing ${expectedXmlFileName} to ${actualXmlFileName}${FitsTester_MainGui.newline}")
 		else
 			println "Comparing ${expectedXmlFileName} to ${actualXmlFileName}"
 		
-		Diff diff = compareXmlFiles(new File(expectedXmlFileName), new File(actualXmlFileName))
+		Diff diff = compareXmlFiles(new File(expectedXmlFileName), new File(actualXmlFileName), ignoreList)
 		println "Is Identical: " + diff.identical()
 		log.info("Is Identical: " + diff.identical())
 		if(textArea != null)
-			textArea.append("Is Identical: " + diff.identical())
+			textArea.append("Is Identical: " + diff.identical() + "${FitsTester_MainGui.newline}")
 		else
 			println "Is Identical: " + diff.identical()
 

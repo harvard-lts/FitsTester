@@ -193,7 +193,9 @@ class FitsCommandProcessor {
 						String expectedFileName = "${expectedRoot}/${fileTypePrefix}${folderStr}${fileOrFolder.name}.xml"
 						
 						// Complete the below to point to the correct file
-						compareResults("${outputFileName}", "${expectedFileName}")
+						String ignoreListProp = config.test.fits.ignore.in.xml.comparison
+						def ignoreList = ignoreListProp.split(",")
+						compareResults("${outputFileName}", "${expectedFileName}", ignoreList)
 					}
 					
 				}
@@ -324,14 +326,14 @@ class FitsCommandProcessor {
 	} // callFits()
 		
 
-	void compareResults(String inputFileName, String expectedFileName) {
+	void compareResults(String inputFileName, String expectedFileName, String ...compareXmlFiles) {
 		
 		println "Now comparing ${inputFileName} to ${expectedFileName}"
 		log.info ("Now comparing ${inputFileName} to ${expectedFileName}")
 
 		TestUtil app = new TestUtil()
 		
-		Diff diff = app.compareXmlFiles(new File(expectedFileName), new File(inputFileName))
+		Diff diff = app.compareXmlFiles(new File(expectedFileName), new File(inputFileName), compareXmlFiles)
 
 		//def expectedDirPath = config.test.fits.expected.root.dir
 		println "Is Identical: " + diff.identical()

@@ -1,7 +1,7 @@
 apply plugin: 'groovy'
 //apply plugin: 'eclipse'
 
-version = 0.3
+version = 0.4
 
 dependencies {
 	// this includes all the files under 'lib' at compile time

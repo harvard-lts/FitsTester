@@ -508,12 +508,16 @@ class FitsTester_MainGui {
 		TestUtil app = new TestUtil(textArea)
 		
 		def expectedDirPath = config.test.fits.expected.root.dir
+		
+		String ignoreListProp = config.test.fits.ignore.in.xml.comparison
+		def ignoreList = ignoreListProp.split(",")
 
 		List<NonMatchingResult> errResults =
 			app.compareXmlInFileOrFolder(
 				file, fileTypePrefix,
 				testOutputDirField,
-				expectedDirPath)
+				expectedDirPath,
+				ignoreList)
 		
 		if (errResults.size() == 0) {
 			textArea.append("${tab}Success for XML Results comparison ${fileOrDirMsg} ${file.name}${newline}")
