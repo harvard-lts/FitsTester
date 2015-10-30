@@ -2,7 +2,7 @@
 ##
 ## This is the shell script to run the COMMAND LINE FITS Test Application
 ##
-TEMP_CLASSPATH=./FitsTester-0.3.jar
+TEMP_CLASSPATH=./FitsTester-0.4.jar
 TEMP_CLASSPATH="$TEMP_CLASSPATH":./lib/groovy-all-2.3.10.jar
 TEMP_CLASSPATH="$TEMP_CLASSPATH":./lib/commons-cli-1.3.1.jar
 TEMP_CLASSPATH="$TEMP_CLASSPATH":./lib/commons-io-2.4.jar
